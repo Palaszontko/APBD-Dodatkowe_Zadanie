@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 namespace EventAPI.Services;
 
 public interface IParticipantService {
-    Task<EventParticipant> AddParticipantToEvent(int participantId, int eventId);
+    Task<ParticipantReportDto> AddParticipantToEvent(int participantId, int eventId);
     Task CancelParticipantRegister(int participantId, int eventId);
     Task<ICollection<ParticipantReportDto>> GetReportForParticipant();
 }
 
 public class ParticipantService(AppDbContext data) : IParticipantService {
-    public async Task<EventParticipant> AddParticipantToEvent(int participantId, int eventId) {
+    public async Task<ParticipantReportDto> AddParticipantToEvent(int participantId, int eventId) {
         var currentEvent = await data.Events.FindAsync(eventId);
         if (currentEvent == null) {
             throw new NotFoundException($"Event with ID {eventId} not found.");
@@ -50,7 +50,34 @@ public class ParticipantService(AppDbContext data) : IParticipantService {
         await data.EventParticipants.AddAsync(eventParticipant);
         await data.SaveChangesAsync();
 
-        return eventParticipant;
+        return await data.Participants
+            .Include(p => p.EventParticipants)
+                .ThenInclude(ep => ep.Event)
+                    .ThenInclude(e => e.EventSpeakers)
+                        .ThenInclude(es => es.Speaker)
+            .Where(p => p.Id == participantId)
+            .Select(p => new ParticipantReportDto {
+                ParticipantId = p.Id,
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                Events = p.EventParticipants
+                    .Select(ep => new EventReportDto {
+                        EventId = ep.EventId,
+                        Title = ep.Event.Title,
+                        Date = ep.Event.Date,
+                        RegisterDate = ep.RegisterDate,
+                        Status = ep.Status,
+                        Speakers = ep.Event.EventSpeakers
+                            .Select(es => new SpeakerDto {
+                                Id = es.Speaker.Id,
+                                FirstName = es.Speaker.FirstName,
+                                LastName = es.Speaker.LastName
+                            })
+                            .ToList()
+                    })
+                    .ToList()
+            })
+            .FirstAsync();
     }
    
     public async Task CancelParticipantRegister(int participantId, int eventId) {
