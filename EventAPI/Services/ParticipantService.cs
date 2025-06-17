@@ -9,7 +9,7 @@ namespace EventAPI.Services;
 public interface IParticipantService {
     Task<ParticipantReportDto> AddParticipantToEvent(int participantId, int eventId);
     Task CancelParticipantRegister(int participantId, int eventId);
-    Task<ICollection<ParticipantReportDto>> GetReportForParticipant();
+    Task<ICollection<ParticipantReportDto>> GetReportForParticipants();
 }
 
 public class ParticipantService(AppDbContext data) : IParticipantService {
@@ -112,7 +112,7 @@ public class ParticipantService(AppDbContext data) : IParticipantService {
 
 
     }
-    public async Task<ICollection<ParticipantReportDto>> GetReportForParticipant() {
+    public async Task<ICollection<ParticipantReportDto>> GetReportForParticipants() {
         return await data.Participants
             .Include(p => p.EventParticipants)
                 .ThenInclude(ep => ep.Event)
@@ -123,6 +123,7 @@ public class ParticipantService(AppDbContext data) : IParticipantService {
                 FirstName = p.FirstName,
                 LastName = p.LastName,
                 Events = p.EventParticipants
+                    .Where(ep => ep.Status == "Registered")
                     .Select(ep => new EventReportDto {
                         EventId = ep.EventId,
                         Title = ep.Event.Title,

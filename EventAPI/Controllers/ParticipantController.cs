@@ -42,6 +42,6 @@ public class ParticipantController(IParticipantService participantService) : Con
 
     [HttpGet("raport")]
     public async Task<IActionResult> GetReportForParticipant() {
-        return Ok(await participantService.GetReportForParticipant());
+        return Ok(await participantService.GetReportForParticipants());
     }
 }
