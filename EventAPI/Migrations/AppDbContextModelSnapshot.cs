@@ -453,7 +453,7 @@ namespace EventAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("EventAPI.Models.Participant", "Participant")
-                        .WithMany()
+                        .WithMany("EventParticipants")
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -485,6 +485,11 @@ namespace EventAPI.Migrations
             modelBuilder.Entity("EventAPI.Models.Event", b =>
                 {
                     b.Navigation("EventSpeakers");
+                });
+
+            modelBuilder.Entity("EventAPI.Models.Participant", b =>
+                {
+                    b.Navigation("EventParticipants");
                 });
 #pragma warning restore 612, 618
         }

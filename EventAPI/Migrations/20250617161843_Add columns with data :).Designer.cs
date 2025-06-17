@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250617153237_Add columns with data :)")]
+    [Migration("20250617161843_Add columns with data :)")]
     partial class Addcolumnswithdata
     {
         /// <inheritdoc />
@@ -456,7 +456,7 @@ namespace EventAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("EventAPI.Models.Participant", "Participant")
-                        .WithMany()
+                        .WithMany("EventParticipants")
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -488,6 +488,11 @@ namespace EventAPI.Migrations
             modelBuilder.Entity("EventAPI.Models.Event", b =>
                 {
                     b.Navigation("EventSpeakers");
+                });
+
+            modelBuilder.Entity("EventAPI.Models.Participant", b =>
+                {
+                    b.Navigation("EventParticipants");
                 });
 #pragma warning restore 612, 618
         }
