@@ -22,4 +22,9 @@ public class EventController(IEventService eventService) : ControllerBase {
         }
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAllEvents() {
+        return Ok(await eventService.GetAllEvents());
+    }
+
 }
