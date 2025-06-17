@@ -25,4 +25,18 @@ public class ParticipantController(IParticipantService participantService) : Con
             return BadRequest(e.Message);
         }
     }
+    
+    [HttpDelete("{participantId}/{eventId}")]
+    public async Task<IActionResult> CancelRegister([FromRoute] int participantId, [FromRoute] int eventId) {
+        try {
+            await participantService.CancelParticipantRegister(participantId, eventId);
+            return NoContent();
+        }
+        catch (NotFoundException e) {
+            return NotFound(e.Message);
+        }
+        catch (CancelRegisterImpossibleException e) {
+            return BadRequest(e.Message);
+        }
+    }
 }

@@ -9,7 +9,7 @@ public interface IEventService {
     public Task<Event> CreateEventAsync(PostEventDto postEventDto);
 }
 
-public class EventService(AppDbContext context) : IEventService {
+public class EventService(AppDbContext data) : IEventService {
     public async Task<Event> CreateEventAsync(PostEventDto postEventDto) {
 
         if (postEventDto.Date < DateTime.Now) {
@@ -23,8 +23,8 @@ public class EventService(AppDbContext context) : IEventService {
             MaxPeople = postEventDto.MaxPeople
         };
         
-        await context.Events.AddAsync(newEvent);
-        await context.SaveChangesAsync();
+        await data.Events.AddAsync(newEvent);
+        await data.SaveChangesAsync();
 
         return new Event {
             Id = newEvent.Id,
