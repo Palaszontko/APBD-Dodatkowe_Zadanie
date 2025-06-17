@@ -16,6 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(opt => {
 
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<ISpeakerService, SpeakerService>();
+builder.Services.AddScoped<IParticipantService, ParticipantService>();
 
 var app = builder.Build();
 
