@@ -68,7 +68,7 @@ public class SpeakerService(AppDbContext data) : ISpeakerService {
         var updatedEvent = await data.Events
             .Include(e => e.EventSpeakers)
             .ThenInclude(es => es.Speaker)
-            .FirstOrDefaultAsync<Event>(e => e.Id == assignSpeakerDto.EventId);
+            .FirstOrDefaultAsync(e => e.Id == assignSpeakerDto.EventId);
 
         if (updatedEvent == null) {
             throw new NotFoundException("Failed to get updated event data.");
