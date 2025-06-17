@@ -39,4 +39,9 @@ public class ParticipantController(IParticipantService participantService) : Con
             return BadRequest(e.Message);
         }
     }
+
+    [HttpGet("raport")]
+    public async Task<IActionResult> GetReportForParticipant() {
+        return Ok(await participantService.GetReportForParticipant());
+    }
 }

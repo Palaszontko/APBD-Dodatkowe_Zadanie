@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using EventAPI.Data;
 using EventAPI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(opt => {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("Default-db"));
 });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options => {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+
 
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<ISpeakerService, SpeakerService>();

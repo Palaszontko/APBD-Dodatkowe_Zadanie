@@ -1,4 +1,5 @@
 using EventAPI.Data;
+using EventAPI.DTOs;
 using EventAPI.Exceptions;
 using EventAPI.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ namespace EventAPI.Services;
 public interface IParticipantService {
     Task<EventParticipant> AddParticipantToEvent(int participantId, int eventId);
     Task CancelParticipantRegister(int participantId, int eventId);
-
+    Task<ICollection<ParticipantReportDto>> GetReportForParticipant();
 }
 
 public class ParticipantService(AppDbContext data) : IParticipantService {
@@ -71,10 +72,6 @@ public class ParticipantService(AppDbContext data) : IParticipantService {
 
         var timeLeft = currentEvent.Date;
         var now = DateTime.Now;
-        
-        Console.WriteLine(timeLeft);
-        Console.WriteLine(now);
-        Console.WriteLine((timeLeft - now).TotalHours);
 
         if ((timeLeft - now).TotalHours >= 24) {
             var affectedRows = await data.EventParticipants.Where(ep => ep.EventId == eventId && ep.ParticipantId == participantId).ExecuteUpdateAsync(
@@ -87,5 +84,34 @@ public class ParticipantService(AppDbContext data) : IParticipantService {
         }
 
 
+    }
+    public async Task<ICollection<ParticipantReportDto>> GetReportForParticipant() {
+        return await data.Participants
+            .Include(p => p.EventParticipants)
+                .ThenInclude(ep => ep.Event)
+                    .ThenInclude(e => e.EventSpeakers)
+                        .ThenInclude(es => es.Speaker)
+            .Select(p => new ParticipantReportDto {
+                ParticipantId = p.Id,
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                Events = p.EventParticipants
+                    .Select(ep => new EventReportDto {
+                        EventId = ep.EventId,
+                        Title = ep.Event.Title,
+                        Date = ep.Event.Date,
+                        RegisterDate = ep.RegisterDate,
+                        Status = ep.Status,
+                        Speakers = ep.Event.EventSpeakers
+                            .Select(es => new SpeakerDto {
+                                Id = es.Speaker.Id,
+                                FirstName = es.Speaker.FirstName,
+                                LastName = es.Speaker.LastName
+                            })
+                            .ToList()
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
     }
 }

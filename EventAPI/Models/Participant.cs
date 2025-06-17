@@ -10,4 +10,6 @@ public class Participant {
     [MaxLength(50)] public string LastName { get; set; } = null!;
 
     [MaxLength(100)] public string? Email { get; set; }
+    
+    public virtual ICollection<EventParticipant> EventParticipants { get; set; } = new List<EventParticipant>();
 }
