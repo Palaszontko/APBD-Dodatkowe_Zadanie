@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250617110617_Add columns with data :)")]
+    [Migration("20250617153237_Add columns with data :)")]
     partial class Addcolumnswithdata
     {
         /// <inheritdoc />
